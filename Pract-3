@@ -1,0 +1,137 @@
+Microsoft Windows [Version 10.0.22631.5472]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Program Files\MySQL\MySQL Server 8.0\bin>mysql -h localhost -u root -p
+Enter password: *********
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 16
+Server version: 8.0.36 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2024, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| cpp                |
+| dbms               |
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+6 rows in set (0.00 sec)
+
+mysql> create database new;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> use new;
+Database changed
+mysql> desc college;
+ERROR 1146 (42S02): Table 'new.college' doesn't exist
+mysql>
+mysql> create table college (name varchar(10),branch varchar(15),address varchar(14));
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> desc college;
++---------+-------------+------+-----+---------+-------+
+| Field   | Type        | Null | Key | Default | Extra |
++---------+-------------+------+-----+---------+-------+
+| name    | varchar(10) | YES  |     | NULL    |       |
+| branch  | varchar(15) | YES  |     | NULL    |       |
+| address | varchar(14) | YES  |     | NULL    |       |
++---------+-------------+------+-----+---------+-------+
+3 rows in set (0.01 sec)
+
+mysql> create user 'Bhakti'@localhost identified by 'root';
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> grant all privileges on *.* to 'Bhakti'@localhost;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> alter table student add address varchar (50);
+ERROR 1146 (42S02): Table 'new.student' doesn't exist
+mysql> alter table college add address varchar (50);
+ERROR 1060 (42S21): Duplicate column name 'address'
+mysql> alter table college add department varchar (50);
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc college;
++------------+-------------+------+-----+---------+-------+
+| Field      | Type        | Null | Key | Default | Extra |
++------------+-------------+------+-----+---------+-------+
+| name       | varchar(10) | YES  |     | NULL    |       |
+| branch     | varchar(15) | YES  |     | NULL    |       |
+| address    | varchar(14) | YES  |     | NULL    |       |
+| department | varchar(50) | YES  |     | NULL    |       |
++------------+-------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> insert into college(name, branch, address, department)values(2, 'pihu','pune sector');
+ERROR 1136 (21S01): Column count doesn't match value count at row 1
+mysql> insert into college (name, branch, address, department)values(1, 'pihu','pune sector');
+ERROR 1136 (21S01): Column count doesn't match value count at row 1
+mysql> insert into college
+    -> (name,branch,address,department)Values(1, 'pihu', 'pune secoter');
+ERROR 1136 (21S01): Column count doesn't match value count at row 1
+mysql>
+mysql> insert into college(name, branch, address, department)values(4,'GP Pune','comp','pune','engineering');
+ERROR 1136 (21S01): Column count doesn't match value count at row 1
+mysql> insert into college(name, branch, address, department)values(4,'comp','GP Pune','engineering');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> select * from college;
++------+--------+---------+-------------+
+| name | branch | address | department  |
++------+--------+---------+-------------+
+| 4    | comp   | GP Pune | engineering |
++------+--------+---------+-------------+
+1 row in set (0.00 sec)
+
+mysql> alter table student add primary key(branch);
+ERROR 1146 (42S02): Table 'new.student' doesn't exist
+mysql> alter table college add primary key(address);
+Query OK, 0 rows affected (0.16 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc college;
++------------+-------------+------+-----+---------+-------+
+| Field      | Type        | Null | Key | Default | Extra |
++------------+-------------+------+-----+---------+-------+
+| name       | varchar(10) | YES  |     | NULL    |       |
+| branch     | varchar(15) | YES  |     | NULL    |       |
+| address    | varchar(14) | NO   | PRI | NULL    |       |
+| department | varchar(50) | YES  |     | NULL    |       |
++------------+-------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> drop table;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 1
+mysql> drop table name;
+ERROR 1051 (42S02): Unknown table 'new.name'
+mysql> alter table college drop primary key;
+Query OK, 1 row affected (0.15 sec)
+Records: 1  Duplicates: 0  Warnings: 0
+
+mysql> alter table college add id INT primary key;
+Query OK, 0 rows affected (0.10 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc college;
++------------+-------------+------+-----+---------+-------+
+| Field      | Type        | Null | Key | Default | Extra |
++------------+-------------+------+-----+---------+-------+
+| name       | varchar(10) | YES  |     | NULL    |       |
+| branch     | varchar(15) | YES  |     | NULL    |       |
+| address    | varchar(14) | NO   |     | NULL    |       |
+| department | varchar(50) | YES  |     | NULL    |       |
+| id         | int         | NO   | PRI | NULL    |       |
++------------+-------------+------+-----+---------+-------+
+5 rows in set (0.00 sec)
