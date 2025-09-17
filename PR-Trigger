@@ -1,0 +1,104 @@
+CREATE OR REPLACE TRIGGER ABC 
+BEFORE UPDATE OR DELETE ON clientmaster
+for each row
+BEGIN
+INSERT INTO audit_log(srno, name)
+VALUES (:OLD.srno, :OLD.name);
+END;
+/
+
+OUTPUT:-
+
+SQL*Plus: Release 21.0.0.0.0 - Production on Wed Sep 10 15:28:50 2025
+Version 21.3.0.0.0
+
+Copyright (c) 1982, 2021, Oracle.  All rights reserved.
+
+Enter user-name: system
+Enter password:
+Last Successful login time: Wed Sep 10 2025 14:51:22 +05:30
+
+Connected to:
+Oracle Database 21c Express Edition Release 21.0.0.0.0 - Production
+Version 21.3.0.0.0
+
+SQL> create table clientmaster(srno int, name varchar(20));
+create table clientmaster(srno int, name varchar(20))
+             *
+ERROR at line 1:
+ORA-00955: name is already used by an existing object
+
+
+SQL> DROP TABLE clientmaster;
+
+Table dropped.
+
+SQL>
+SQL> CREATE TABLE clientmaster (
+  2    srno INT,
+  3    name VARCHAR(20)
+  4  );
+
+Table created.
+
+SQL> create table audit as select * from clientmaster;
+create table audit as select * from clientmaster
+             *
+ERROR at line 1:
+ORA-00903: invalid table name
+
+
+SQL> CREATE TABLE audit_log AS SELECT * FROM clientmaster;
+
+Table created.
+
+SQL> desc audit_log;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ SRNO                                               NUMBER(38)
+ NAME                                               VARCHAR2(20)
+
+SQL> desc clientmaster;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ SRNO                                               NUMBER(38)
+ NAME                                               VARCHAR2(20)
+
+SQL> insert into clientmaster values(101,'bhakti');
+
+1 row created.
+
+SQL> insert into clientmaster values(102,'riya');
+
+1 row created.
+
+SQL> @ C:\Users\System05\Desktop\PLSQL\xyz.sql
+
+Trigger created.
+
+SQL> update clientmaster set name='saniya' where srno=101;
+
+1 row updated.
+
+SQL> select * from audit_log;
+
+      SRNO NAME
+---------- --------------------
+       101 bhakti
+
+SQL> delete from clientmaster;
+
+2 rows deleted.
+
+SQL> select * from audit_log;
+
+      SRNO NAME
+---------- --------------------
+       101 bhakti
+       101 saniya
+       102 riya
+
+SQL> insert into clientmaster values(103,'pruthvi');
+
+1 row created.
+
