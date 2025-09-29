@@ -1,200 +1,184 @@
 Explicit Cursor
 
 DECLARE
-CURSOR prod_cursor is select pid, pname, price from product;
+   CURSOR prod_cursor IS
+      SELECT product_id, product_name, price FROM productinfo;
 
-v_id    product.pid%TYPE;
-v_name  product.pname%TYPE;
-v_price product.price%TYPE;
+   p_product_id   productinfo.product_id%TYPE;
+   p_product_name productinfo.product_name%TYPE;
+   p_price        productinfo.price%TYPE;
 BEGIN
-OPEN prod_cursor;
-LOOP
-FETCH prod_cursor into v_id, v_name, v_price;
-EXIT when prod_cursor%NOTFOUND;
-DBMS_OUTPUT.PUT_LINE('ID: ' || v_id || ', Name: ' || v_name || ', Price: ' || v_price);
-END LOOP;
-CLOSE prod_cursor;
+   OPEN prod_cursor;
+   LOOP
+      FETCH prod_cursor INTO p_product_id, p_product_name, p_price;
+      EXIT WHEN prod_cursor%NOTFOUND;
+
+      DBMS_OUTPUT.PUT_LINE('Product ID: ' || p_product_id);
+      DBMS_OUTPUT.PUT_LINE('Product Name: ' || p_product_name);
+      DBMS_OUTPUT.PUT_LINE('Price: ' || p_price);
+   END LOOP;
+   CLOSE prod_cursor;
 END;
 /
 
 Implicit Cursor
 
-BEGIN
-insert into product (pid, pname, price) values (3, 'tablet', 18000.00);
-
-DBMS_OUTPUT.PUT_LINE('Rows inserted: ' || SQL%ROWCOUNT);
-END;
+declare
+p_price productinfo.price%type;
+begin
+select price into p_price from productinfo where product_id=101;
+if sql%found then
+dbms_output.put_line('Price fetched:'||p_price);
+else
+dbms_output.put_line('Productinfo not found.');
+end if;
+end;
 /
 
 
 parameterized.sql
 DECLARE
-CURSOR price_cursor(p_min_price NUMBER) is select pid, pname, price from product where price > p_min_price;
+  CURSOR product_cursor(p_price_1 NUMBER) IS 
+    SELECT product_id, product_name, price 
+    FROM productinfo 
+    WHERE price > p_price_1;
 
-v_id    product.pid%TYPE;
-v_name  product.pname%TYPE;
-v_price product.price%TYPE;
+  p_product_id   productinfo.product_id%TYPE;
+  p_product_name productinfo.product_name%TYPE;
+  p_price productinfo.price%TYPE;
 
+  v_input NUMBER;  
 BEGIN
-OPEN price_cursor(10000);
-LOOP
-FETCH price_cursor INTO v_id, v_name, v_price;
-EXIT WHEN price_cursor%NOTFOUND;
+  v_input := &enter_price;
 
-DBMS_OUTPUT.PUT_LINE('ID: ' || v_id || ', Name: ' || v_name || ', Price: ' || v_price);
-END LOOP;
-CLOSE price_cursor;
+  DBMS_OUTPUT.PUT_LINE('Starting to fetch products above price ' || v_input || '...');
+
+  OPEN product_cursor(v_input);
+  LOOP
+    FETCH product_cursor INTO p_product_id, p_product_name, p_price;
+    EXIT WHEN product_cursor%NOTFOUND;
+    DBMS_OUTPUT.PUT_LINE('pid: ' || p_product_id || ', name: ' || p_product_name || ', price: ' || p_price);
+  END LOOP;
+  CLOSE product_cursor;
+
+  DBMS_OUTPUT.PUT_LINE('Done fetching products.');
+EXCEPTION
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('An error occurred: ' || SQLERRM);
 END;
 /
 
-update.sql
+for loop.sql
+DECLARE
+v_increase NUMBER := 2.10;  
 BEGIN
-for rec IN (select pid, price from product where price < 5000)
-LOOP
-update product
-SET price = rec.price * 1.10 where pid = rec.pid;
+FOR rec IN (SELECT product_id, price FROM productinfo WHERE price < 5000) LOOP
+UPDATE productinfo
+SET price = rec.price * v_increase
+WHERE product_id = rec.product_id;
 END LOOP;
-
-commit;
 DBMS_OUTPUT.PUT_LINE('Prices updated.');
 END;
 /
 
 Output:-
-SQL*Plus: Release 21.0.0.0.0 - Production on Wed Sep 10 21:57:41 2025
+SQL*Plus: Release 21.0.0.0.0 - Production on Mon Sep 29 15:45:18 2025
 Version 21.3.0.0.0
 
 Copyright (c) 1982, 2021, Oracle.  All rights reserved.
 
 Enter user-name: system
 Enter password:
-Last Successful login time: Wed Sep 10 2025 21:57:12 +05:30
+Last Successful login time: Sat Sep 27 2025 11:24:39 +05:30
 
 Connected to:
 Oracle Database 21c Express Edition Release 21.0.0.0.0 - Production
 Version 21.3.0.0.0
 
-SQL> create table product(pid number(12), pname varchar2(30),price number (20,2));
+SQL> CREATE TABLE product_info (
+  2      product_id   NUMBER PRIMARY KEY,
+  3      product_name VARCHAR2(50),
+  4      price        NUMBER(10,2)
+  5  );
 
 Table created.
 
-SQL> insert into product (pid,pname,price) values ( 1,'mobile',30000.00);
+SQL> @"C:\Users\Bhoskar Bhakti\OneDrive\Desktop\pl sql\EXPLICIT.sql"
+
+PL/SQL procedure successfully completed.
+
+SQL> insert into productinfo values (100,'laptop',110);
 
 1 row created.
 
-SQL> insert into product (pid,pname,price) values ( 2,'laptop',70000.00);
+SQL> insert into productinfo values (101,'Mobile',10000);
 
 1 row created.
 
-SQL> commit;
-
-Commit complete.
-
-SQL> select * from product;
-
-       PID PNAME                     PRICE
----------- -------------------- ----------
-         1 mobile                    30000
-         2 laptop                    70000
-
-SQL> @ D:\Degree\DBMS\cursor\implicit.sql
-
-PL/SQL procedure successfully completed.
-
-SQL> select * from product;
-
-       PID PNAME                     PRICE
----------- -------------------- ----------
-         1 mobile                    30000
-         2 laptop                    70000
-         3 tablet                    18000
-
-SQL> @ D:\Degree\DBMS\cursor\explicit.sql
-
-PL/SQL procedure successfully completed.
-
-SQL> set serveroutput on
-SQL> @ D:\Degree\DBMS\cursor\explicit.sql
-ID: 1, Name: mobile, Price: 30000
-ID: 2, Name: laptop, Price: 70000
-ID: 3, Name: tablet, Price: 18000
-
-PL/SQL procedure successfully completed.
-
-SQL> @ D:\Degree\DBMS\cursor\parameterized.sql
-ID: 1, Name: mobile, Price: 30000
-ID: 2, Name: laptop, Price: 70000
-ID: 3, Name: tablet, Price: 18000
-
-PL/SQL procedure successfully completed.
-
-SQL> @ D:\Degree\DBMS\cursor\update.sql
-Prices updated.
-
-PL/SQL procedure successfully completed.
-
-SQL> select * from product;
-
-       PID PNAME                     PRICE
----------- -------------------- ----------
-         1 mobile                    30000
-         2 laptop                    70000
-         3 tablet                    18000
-
-SQL> insert into product (pid,pname,price) values ( 4,'headphone',4500.00);
+SQL> insert into productinfo values (102,'EarBuds',900);
 
 1 row created.
 
-SQL> select * from product;
-
-       PID PNAME                     PRICE
----------- -------------------- ----------
-         1 mobile                    30000
-         2 laptop                    70000
-         3 tablet                    18000
-         4 headphone               4500
-
-SQL> @ D:\Degree\DBMS\cursor\update.sql
-Prices updated.
-
-PL/SQL procedure successfully completed.
-
-SQL> select * from product;
-
-       PID PNAME                     PRICE
----------- -------------------- ----------
-         1 mobile                    30000
-         2 laptop                    70000
-         3 tablet                    18000
-         4 headphone                  4500
-
-SQL> insert into product (pid,pname,price) values ( 5,'watch',3000.00);
+SQL> insert into productinfo values (103,'SmartTV',30000);
 
 1 row created.
 
-SQL> select * from product;
+SQL> select * from productinfo;
 
-       PID PNAME                     PRICE
----------- -------------------- ----------
-         1 mobile                    30000
-         2 laptop                    70000
-         3 tablet                    18000
-         4 headphone                  4500
-         5 watch                      3000
+PRODUCT_ID PRODUCT_NAME                                            PRICE
+---------- -------------------------------------------------- ----------
+       100 laptop                                                    110
+       101 Mobile                                                  10000
+       102 EarBuds                                                   900
+       103 SmartTV                                                 30000
 
-SQL> @ D:\Degree\DBMS\cursor\update.sql
-Prices updated.
+SQL> @"C:\Users\Bhoskar Bhakti\OneDrive\Desktop\pl sql\IMPLICIT.sql"
 
 PL/SQL procedure successfully completed.
 
-SQL> select * from product;
+SQL> @"C:\Users\Bhoskar Bhakti\OneDrive\Desktop\pl sql\EXPLICIT.sql"
 
-       PID PNAME                     PRICE
----------- -------------------- ----------
-         1 mobile                    30000
-         2 laptop                    70000
-         3 tablet                    18000
-         4 headphone                  4500
-         5 watch                      3500
+PL/SQL procedure successfully completed.
+
+SQL> @"C:\Users\Bhoskar Bhakti\OneDrive\Desktop\pl sql\EXPLICIT.sql"
+
+PL/SQL procedure successfully completed.
+
+SQL> @"C:\Users\Bhoskar Bhakti\OneDrive\Desktop\pl sql\PARAMETERIZED.sql"
+Enter value for enter_price: 110
+old  13:   v_input := &enter_price;
+new  13:   v_input := 110;
+
+PL/SQL procedure successfully completed.
+
+SQL> @"C:\Users\Bhoskar Bhakti\OneDrive\Desktop\pl sql\PARAMETERIZED.sql"
+Enter value for enter_price: 10000
+old  13:   v_input := &enter_price;
+new  13:   v_input := 10000;
+
+PL/SQL procedure successfully completed.
+
+SQL> @"C:\Users\Bhoskar Bhakti\OneDrive\Desktop\pl sql\PARAMETERIZED.sql"
+Enter value for enter_price: 900
+old  13:   v_input := &enter_price;
+new  13:   v_input := 900;
+
+PL/SQL procedure successfully completed.
+
+SQL> @"C:\Users\Bhoskar Bhakti\OneDrive\Desktop\pl sql\foor loop.sql"
+SP2-0310: unable to open file "C:\Users\Bhoskar Bhakti\OneDrive\Desktop\pl sql\foor loop.sql"
+SQL> @"C:\Users\Bhoskar Bhakti\OneDrive\Desktop\pl sql\for loop.sql"
+
+PL/SQL procedure successfully completed.
+
+SQL> select * from productinfo;
+
+PRODUCT_ID PRODUCT_NAME                                            PRICE
+---------- -------------------------------------------------- ----------
+       100 laptop                                                    231
+       101 Mobile                                                  10000
+       102 EarBuds                                                  1890
+       103 SmartTV                                                 30000
+
 
 
