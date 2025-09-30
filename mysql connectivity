@@ -1,132 +1,188 @@
-package Practical9;
+package collegedemo;
 import java.sql.*;
 import java.util.*;
-public class SwitchCaseOperation {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/demo_a1", "root", "root");
-            Statement stm = con.createStatement();
-            String createTable = "CREATE TABLE IF NOT EXISTS product (pid INT PRIMARY KEY, pname VARCHAR(20), price INT)";
-            stm.executeUpdate(createTable);
-            while (true) {
-                System.out.println("\n Product Menu");
-                System.out.println("1. Add Product");
-                System.out.println("2. Update Product");
-                System.out.println("3. Delete Product");
-                System.out.println("4. Show All Products");
-                System.out.println("5. Exit");
-                System.out.print("Enter your choice: ");
-                int choice = sc.nextInt();
-                sc.nextLine();
-                switch (choice) {
-                    case 1:
-                        System.out.print("Enter product id: ");
-                        int pidInsert = sc.nextInt();
-                        sc.nextLine();
-                        System.out.print("Enter product name: ");
-                        String pnameInsert = sc.nextLine();
-                        System.out.print("Enter product price: ");
-                        int priceInsert = sc.nextInt();
-                        String insertSQL = "INSERT INTO product VALUES(" + pidInsert + ", '" + pnameInsert + "', " + priceInsert + ")";
-                        stm.executeUpdate(insertSQL);
-                        System.out.println("Product added successfully.");
-                        break;
-                    case 2:
-                        System.out.print("Enter id of product to update: ");
-                        int pidUpdate = sc.nextInt();
-                        sc.nextLine();
-                        System.out.print("Enter new product name: ");
-                        String pnameUpdate = sc.nextLine();
-                        System.out.print("Enter new product price: ");
-                        int priceUpdate = sc.nextInt();
-                        String updateSQL = "UPDATE product SET pname='" + pnameUpdate + "', price=" + priceUpdate + " WHERE pid=" + pidUpdate;
-                        stm.executeUpdate(updateSQL);
-                        System.out.println("Product updated successfully.");
-                        break;
-                    case 3:
-                        System.out.print("Enter id of product to delete: ");
-                        int pidDelete = sc.nextInt();
-                        String deleteSQL = "DELETE FROM product WHERE pid=" + pidDelete;
-                        stm.executeUpdate(deleteSQL);
-                        System.out.println("Product deleted successfully.");
-                        break;
-                    case 4:
-                        ResultSet rs = stm.executeQuery("SELECT * FROM product");
-                        System.out.println("\nAll Products:");
-                        while (rs.next()) {
-                            System.out.println("Id: " + rs.getInt("pid") + ", Name: " + rs.getString("pname") + ", Price: " + rs.getInt("price"));
-                        }
-                        rs.close();
-                        break;
-                    case 5:
-                        System.out.println("Exiting program. Bye!");
-                        stm.close();
-                        con.close();
-                        sc.close();
-                        System.exit(0);
-                        break;
-                    default:
-                        System.out.println("Invalid choice! Please choose 1-5.");
-                }
-            }
-        } catch (Exception e) {
-            System.out.println("Error: " + e);
-        }
-    }
+public class databaseconnect {
+public static void main(String[] args) {
+try {
+Class.forName("com.mysql.cj.jdbc.Driver");
+Connection con=DriverManager.getConnection("jdbc:mysql://localhost/collegedemos1","root","root");
+			Statement stm=con.createStatement();
+			Scanner sc = new Scanner(System.in);
+			int choice;
+			 do {
+	                System.out.println("\n--- MENU ---");
+	                System.out.println("1. Insert student record");
+	                System.out.println("2. Delete student record");
+	                System.out.println("3. Exit");
+	                System.out.print("Enter your choice: ");
+	                choice = sc.nextInt();
+
+	                switch (choice) {
+	                    case 1:
+	                        System.out.print("Enter roll number: ");
+	                        int r = sc.nextInt();
+	                        sc.nextLine(); // consume newline
+	                        System.out.print("Enter name: ");
+	                        String nm = sc.nextLine();
+	                        System.out.print("Enter address: ");
+	                        String addr = sc.nextLine();
+	                        String insertQuery = "INSERT INTO stud VALUES(" + r + ", '" + nm + "', '" + addr + "')";
+	                        stm.executeUpdate(insertQuery);
+	                        System.out.println(" Record inserted successfully.");
+	                        break;
+
+	                    case 2:
+	                        System.out.print("Enter roll number to delete: ");
+	                        int rollToDelete = sc.nextInt();
+	                        String deleteQuery = "DELETE FROM stud WHERE rollno =rollToDelete;
+ 
+	                        int rowsAffected = stm.executeUpdate(deleteQuery);
+	                        if (rowsAffected > 0) {
+	                            System.out.println("Record deleted successfully.");
+	                        } else {
+	                            System.out.println(" No record found with that roll number.");
+	                        }
+	                        break;
+
+	                    case 3:
+	                        System.out.println(" Exiting program...");
+	                        break;
+
+	                    default:
+	                        System.out.println(" Invalid choice. Please try again.");
+	                }
+	            } while (choice != 3);
+
+	            con.close();
+	            sc.close();
+
+//Scanner sc=new Scanner(System.in)
+//String str="create database collegedemos1";
+//String str="create table stud(rollno int, name varchar(20),address varchar(20))";
+//stm.executeUpdate(str);
+//System.out.println("database created");
+//System.out.println("table created");
 }
-•	OUTPUT :
-Product Menu
-1. Add Product
-2. Update Product
-3. Delete Product
-4. Show All Products
-5. Exit
+catch(Exception e) {
+System.out.println(e);
+		}
+	}
+}
+
+
+OUTPUT :
+--- MENU ---
+1. Insert student record
+2. Delete student record
+3. Exit
 Enter your choice: 1
-Enter product id: 101
-Enter product name: pen
-Enter product price: 10
-Product added successfully.
+Enter roll number: 101
+Enter name: bhakti
+Enter address: Pune
+ Record inserted successfully.
 
- Product Menu
-1. Add Product
-2. Update Product
-3. Delete Product
-4. Show All Products
-5. Exit
+--- MENU ---
+1. Insert student record
+2. Delete student record
+3. Exit
+Enter your choice: 1
+Enter roll number: 102
+Enter name: Pruthvi
+Enter address: pune
+ Record inserted successfully.
+
+--- MENU ---
+1. Insert student record
+2. Delete student record
+3. Exit
+Enter your choice: 1
+Enter roll number: 103
+Enter name: shru
+Enter address: Pune
+ Record inserted successfully.
+
+--- MENU ---
+1. Insert student record
+2. Delete student record
+3. Exit
 Enter your choice: 2
-Enter id of product to update: 101
-Enter new product name: pencil
-Enter new product price: 20
-Product updated successfully.
+Enter roll number to delete: 103
+Record deleted successfully.
 
- Product Menu
-1. Add Product
-2. Update Product
-3. Delete Product
-4. Show All Products
-5. Exit
-Enter your choice: 4
-
-All Products:
-Id: 101, Name: pencil, Price: 20
-
- Product Menu
-1. Add Product
-2. Update Product
-3. Delete Product
-4. Show All Products
-5. Exit
+--- MENU ---
+1. Insert student record
+2. Delete student record
+3. Exit
 Enter your choice: 3
-Enter id of product to delete: 101
-Product deleted successfully.
+ Exiting program...
 
- Product Menu
-1. Add Product
-2. Update Product
-3. Delete Product
-4. Show All Products
-5. Exit
-Enter your choice: 5
+OUTPUT :-
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| airlines           |
+| bank               |
+| bankdb             |
+| college            |
+| college_new        |
+| collegedemo        |
+| collegedemos       |
+| collegedemos1      |
+| db                 |
+| employee           |
+| information_schema |
+| mysql              |
+| new                |
+| p1                 |
+| pd1                |
+| performance_schema |
+| post               |
+| student_db         |
+| sys                |
++--------------------+
+19 rows in set (0.03 sec)
+
+mysql> use collegedemos;
+Database changed
+mysql> select * from stud;
++--------+----------+---------+
+| rollno | name     | address |
++--------+----------+---------+
+|    101 | bhakti   | pune    |
+|    102 | pruthvi  | pune    |
++--------+----------+---------+
+2 rows in set (0.00 sec)
+
+mysql> use collegedemos1;
+Database changed
+mysql> select * from stud;
++--------+----------+---------+
+| rollno | name     | address |
++--------+----------+---------+
+|    101 | bhakti   | Pune    |
+|    102 | Pruthvi  | pune    |
+|    103 | shru     | Pune    |
++--------+----------+---------+
+3 rows in set (0.00 sec)
+
+mysql> commit;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> select * from stud;
++--------+----------+---------+
+| rollno | name     | address |
++--------+----------+---------+
+|    101 | bhakti   | Pune    |
+|    102 | pruthvi  | pune    |
++--------+----------+---------+
+2 rows in set (0.00 sec)
+
+
+
