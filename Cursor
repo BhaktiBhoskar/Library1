@@ -103,10 +103,6 @@ SQL> CREATE TABLE product_info (
 
 Table created.
 
-SQL> @"C:\Users\Bhoskar Bhakti\OneDrive\Desktop\pl sql\EXPLICIT.sql"
-
-PL/SQL procedure successfully completed.
-
 SQL> insert into productinfo values (100,'laptop',110);
 
 1 row created.
@@ -133,10 +129,6 @@ PRODUCT_ID PRODUCT_NAME                                            PRICE
        103 SmartTV                                                 30000
 
 SQL> @"C:\Users\Bhoskar Bhakti\OneDrive\Desktop\pl sql\IMPLICIT.sql"
-
-PL/SQL procedure successfully completed.
-
-SQL> @"C:\Users\Bhoskar Bhakti\OneDrive\Desktop\pl sql\EXPLICIT.sql"
 
 PL/SQL procedure successfully completed.
 
