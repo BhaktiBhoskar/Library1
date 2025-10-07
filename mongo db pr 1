@@ -1,117 +1,72 @@
 use cricket
 switched to db cricket
-db["matches"].find()
+db.createCollection("players")
+db.createCollection("teams")
+db.createCollection("matches")
+{ ok: 1 }
+db.players.insertMany([
+  {
+    player_id: 1,
+    name: "Virat Kohli",
+    role: "Batsman",
+    team: "India",
+    batting_style: "Right-hand bat",
+    bowling_style: "Right-arm medium",
+    matchplayed: 275,
+    runs: 13000,
+    strikerate: 93.5,
+    wicket: 4
+  },
+  {
+    player_id: 2,
+    name: "Rohit Sharma",
+    role: "Batsman",
+    team: "India",
+    batting_style: "Right-hand bat",
+    bowling_style: "Off spin",
+    matchplayed: 250,
+    runs: 10000,
+    strikerate: 90.2,
+    wicket: 8
+  },
+  {
+    player_id: 3,
+    name: "Jasprit Bumrah",
+    role: "Bowler",
+    team: "India",
+    batting_style: "Right-hand bat",
+    bowling_style: "Right-arm fast",
+    matchplayed: 120,
+    runs: 300,
+    strikerate: 65.4,
+    wicket: 180
+  }
+])
 {
-  _id: ObjectId('68d4d59d17ad98c54c7b6e2c')
-}
-{
-  _id: ObjectId('68d4d70717ad98c54c7b6e30'),
-  match_id: 101,
-  day: '2025-09-24',
-  teams: [
-    'India',
-    'Australia'
-  ],
-  toss: 'India',
-  match_time: '14:00',
-  result: 'India won',
-  man_of_the_match: 'Virat Kohli'
-}
-db["players"].find()
-{
-  _id: ObjectId('68d4d6ce17ad98c54c7b6e2d'),
-  player_id: 1,
-  name: 'Virat Kohli',
-  role: 'Batsman',
-  team: 'India',
-  batting_style: 'Right-hand bat',
-  bowling_style: 'None',
-  matches_played: 251,
-  runs: 12080,
-  strike_rate: 92.5,
-  wickets: 4
-}
-{
-  _id: ObjectId('68d4d6ce17ad98c54c7b6e2e'),
-  player_id: 2,
-  name: 'Jasprit Bumrah',
-  role: 'Bowler',
-  team: 'India',
-  batting_style: 'Right-hand bat',
-  bowling_style: 'Right-arm fast',
-  matches_played: 150,
-  runs: 500,
-  strike_rate: 80.2,
-  wickets: 200
-}
-db["teams"].find()
-{
-  _id: ObjectId('68d4d6e217ad98c54c7b6e2f'),
-  team_id: 1,
-  team_name: 'India',
-  captain: 'Rohit Sharma',
-  players: [
-    'Virat Kohli',
-    'Jasprit Bumrah',
-    'KL Rahul'
-  ]
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId('68e554168fc4c6dd3f2b8266'),
+    '1': ObjectId('68e554168fc4c6dd3f2b8267'),
+    '2': ObjectId('68e554168fc4c6dd3f2b8268')
+  }
 }
 db.players.find().pretty()
+db.players.find({}, { name: 1, runs: 1, _id: 0 })
 {
-  _id: ObjectId('68d4d6ce17ad98c54c7b6e2d'),
-  player_id: 1,
   name: 'Virat Kohli',
-  role: 'Batsman',
-  team: 'India',
-  batting_style: 'Right-hand bat',
-  bowling_style: 'None',
-  matches_played: 251,
-  runs: 12080,
-  strike_rate: 92.5,
-  wickets: 4
+  runs: 13000
 }
 {
-  _id: ObjectId('68d4d6ce17ad98c54c7b6e2e'),
-  player_id: 2,
+  name: 'Rohit Sharma',
+  runs: 10000
+}
+{
   name: 'Jasprit Bumrah',
-  role: 'Bowler',
-  team: 'India',
-  batting_style: 'Right-hand bat',
-  bowling_style: 'Right-arm fast',
-  matches_played: 150,
-  runs: 500,
-  strike_rate: 80.2,
-  wickets: 200
-}
-db.teams.find().pretty()
-{
-  _id: ObjectId('68d4d6e217ad98c54c7b6e2f'),
-  team_id: 1,
-  team_name: 'India',
-  captain: 'Rohit Sharma',
-  players: [
-    'Virat Kohli',
-    'Jasprit Bumrah',
-    'KL Rahul'
-  ]
-}
-db.players.find({ role: "Batsman", strike_rate: { $gt: 50 } })
-{
-  _id: ObjectId('68d4d6ce17ad98c54c7b6e2d'),
-  player_id: 1,
-  name: 'Virat Kohli',
-  role: 'Batsman',
-  team: 'India',
-  batting_style: 'Right-hand bat',
-  bowling_style: 'None',
-  matches_played: 251,
-  runs: 12080,
-  strike_rate: 92.5,
-  wickets: 4
+  runs: 300
 }
 db.players.updateOne(
   { name: "Virat Kohli" },
-  { $inc: { runs: 85, match_played: 1 } }
+  { $inc: { runs: 75 } }
 )
 {
   acknowledged: true,
@@ -120,24 +75,215 @@ db.players.updateOne(
   modifiedCount: 1,
   upsertedCount: 0
 }
-db.matches.deleteMany({ result: "Cancelled" })
+db.players.deleteOne({ wicket: { $lt: 5 } })
 {
   acknowledged: true,
-  deletedCount: 0
+  deletedCount: 1
 }
-db.players.find({ wickets: { $gt: 100 }, runs: { $gt: 0 } })
+db.players.find({
+  $and: [
+    { role: "Batsman" },
+    { strikerate: { $gt: 80 } }
+  ]
+})
+db.players.find({
+  $or: [
+    { team: "India" },
+    { wicket: { $gt: 100 } }
+  ]
+})
 {
-  _id: ObjectId('68d4d6ce17ad98c54c7b6e2e'),
+  _id: ObjectId('68e554168fc4c6dd3f2b8267'),
   player_id: 2,
+  name: 'Rohit Sharma',
+  role: 'Batsman',
+  team: 'India',
+  batting_style: 'Right-hand bat',
+  bowling_style: 'Off spin',
+  matchplayed: 250,
+  runs: 10000,
+  strikerate: 90.2,
+  wicket: 8
+}
+{
+  _id: ObjectId('68e554168fc4c6dd3f2b8268'),
+  player_id: 3,
   name: 'Jasprit Bumrah',
   role: 'Bowler',
   team: 'India',
   batting_style: 'Right-hand bat',
   bowling_style: 'Right-arm fast',
-  matches_played: 150,
-  runs: 500,
-  strike_rate: 80.2,
-  wickets: 200
+  matchplayed: 120,
+  runs: 300,
+  strikerate: 65.4,
+  wicket: 180
 }
-cricket
+db.players.find({ strikerate: { $gt: 80 } })
+{
+  _id: ObjectId('68e554168fc4c6dd3f2b8267'),
+  player_id: 2,
+  name: 'Rohit Sharma',
+  role: 'Batsman',
+  team: 'India',
+  batting_style: 'Right-hand bat',
+  bowling_style: 'Off spin',
+  matchplayed: 250,
+  runs: 10000,
+  strikerate: 90.2,
+  wicket: 8
+}
+db.players.find({ wicket: { $gt: 100 } })
+{
+  _id: ObjectId('68e554168fc4c6dd3f2b8268'),
+  player_id: 3,
+  name: 'Jasprit Bumrah',
+  role: 'Bowler',
+  team: 'India',
+  batting_style: 'Right-hand bat',
+  bowling_style: 'Right-arm fast',
+  matchplayed: 120,
+  runs: 300,
+  strikerate: 65.4,
+  wicket: 180
+}
+db.players.find({ matchplayed: { $gte: 200 } })
+{
+  _id: ObjectId('68e554168fc4c6dd3f2b8267'),
+  player_id: 2,
+  name: 'Rohit Sharma',
+  role: 'Batsman',
+  team: 'India',
+  batting_style: 'Right-hand bat',
+  bowling_style: 'Off spin',
+  matchplayed: 250,
+  runs: 10000,
+  strikerate: 90.2,
+  wicket: 8
+}
+db.players.find({ team: { $in: ["India", "Australia"] } })
+{
+  _id: ObjectId('68e554168fc4c6dd3f2b8267'),
+  player_id: 2,
+  name: 'Rohit Sharma',
+  role: 'Batsman',
+  team: 'India',
+  batting_style: 'Right-hand bat',
+  bowling_style: 'Off spin',
+  matchplayed: 250,
+  runs: 10000,
+  strikerate: 90.2,
+  wicket: 8
+}
+{
+  _id: ObjectId('68e554168fc4c6dd3f2b8268'),
+  player_id: 3,
+  name: 'Jasprit Bumrah',
+  role: 'Bowler',
+  team: 'India',
+  batting_style: 'Right-hand bat',
+  bowling_style: 'Right-arm fast',
+  matchplayed: 120,
+  runs: 300,
+  strikerate: 65.4,
+  wicket: 180
+}
+db.players.find({ role: { $ne: "Bowler" } })
+{
+  _id: ObjectId('68e554168fc4c6dd3f2b8267'),
+  player_id: 2,
+  name: 'Rohit Sharma',
+  role: 'Batsman',
+  team: 'India',
+  batting_style: 'Right-hand bat',
+  bowling_style: 'Off spin',
+  matchplayed: 250,
+  runs: 10000,
+  strikerate: 90.2,
+  wicket: 8
+}
+db.players.find({
+  $and: [
+    { role: "Batsman" },
+    { strikerate: { $gt: 80 } }
+  ]
+})
+db.players.find({
+  $or: [
+    { team: "India" },
+    { wicket: { $gt: 100 } }
+  ]
+})
+{
+  _id: ObjectId('68e554168fc4c6dd3f2b8267'),
+  player_id: 2,
+  name: 'Rohit Sharma',
+  role: 'Batsman',
+  team: 'India',
+  batting_style: 'Right-hand bat',
+  bowling_style: 'Off spin',
+  matchplayed: 250,
+  runs: 10000,
+  strikerate: 90.2,
+  wicket: 8
+}
+{
+  _id: ObjectId('68e554168fc4c6dd3f2b8268'),
+  player_id: 3,
+  name: 'Jasprit Bumrah',
+  role: 'Bowler',
+  team: 'India',
+  batting_style: 'Right-hand bat',
+  bowling_style: 'Right-arm fast',
+  matchplayed: 120,
+  runs: 300,
+  strikerate: 65.4,
+  wicket: 180
+}
+let playerName = "Rohit Sharma";
+let addedRuns = 50;
+
+db.players.find({ name: playerName });
+
+db.players.updateOne(
+  { name: playerName },
+  { $inc: { runs: addedRuns } }
+);
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+show collections
+matches
+players
+teams
+db.players.find().pretty()
+{
+  _id: ObjectId('68e554168fc4c6dd3f2b8267'),
+  player_id: 2,
+  name: 'Rohit Sharma',
+  role: 'Batsman',
+  team: 'India',
+  batting_style: 'Right-hand bat',
+  bowling_style: 'Off spin',
+  matchplayed: 250,
+  runs: 10050,
+  strikerate: 90.2,
+  wicket: 8
+}
+{
+  _id: ObjectId('68e554168fc4c6dd3f2b8268'),
+  player_id: 3,
+  name: 'Jasprit Bumrah',
+  role: 'Bowler',
+  team: 'India',
+  batting_style: 'Right-hand bat',
+  bowling_style: 'Right-arm fast',
+  matchplayed: 120,
+  runs: 300,
+  strikerate: 65.4,
+  wicket: 180
+}
 
