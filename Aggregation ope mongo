@@ -230,7 +230,6 @@ demo1> db.emp.find().sort({ename:-1});
     dept: 'IT'
   }
 ]
-]
 demo1>  db.emp.find().sort({salary:-1});
 [
   {
