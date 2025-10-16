@@ -1,0 +1,89 @@
+Code:-
+·	DatabaseConnectivity In MongoDB :
+1.	Insert Operation :
+pip install pymongo
+from pymongo import MongoClient
+conn = MongoClient("mongodb://localhost:27017/")
+db_in = input("Enter the database name: ")
+db = conn[db_in]
+
+coll_in = input("Enter the collection name: ")
+coll = db[coll_in]
+
+pid = int(input("Enter product ID: "))
+pname = input("Enter product name: ")
+price = float(input("Enter price: "))
+
+rec = {"pid": pid, "pname": pname, "price": price}
+coll.insert_one(rec)
+
+print("Data has been inserted")
+
+·	OUTPUT :
+_id
+68ee006b6e049560292babd8
+pid
+101
+pname
+"Notebook"
+price
+200
+
+
+·	Update Operation :
+from pymongo import MongoClient
+
+conn = MongoClient("mongodb://localhost:27017/")
+db_name = input("Enter the database name: ")
+db = conn[db_name]
+
+coll_name = input("Enter the collection name: ")
+coll = db[coll_name]
+
+pid = int(input("Enter product ID to update: "))
+new_pname = input("Enter new product name: ")
+new_price = float(input("Enter new price: "))
+
+result = coll.update_one(
+    {"pid": pid},
+    {"$set": {"pname": new_pname, "price": new_price}}
+)
+
+if result.matched_count:
+    print("Record updated.")
+else:
+    print("No matching record found.")
+Record updated.
+
+·	OUTPUT :
+_id
+68ee006b6e049560292babd8
+pid
+101
+pname
+"Notebook"
+price
+300
+
+·	Delete Operations :
+from pymongo import MongoClient
+
+conn = MongoClient("mongodb://localhost:27017/")
+db_name = input("Enter the database name: ")
+db = conn[db_name]
+
+coll_name = input("Enter the collection name: ")
+coll = db[coll_name]
+
+pid = int(input("Enter product ID to delete: "))
+
+result = coll.delete_one({"pid": pid})
+
+if result.deleted_count:
+    print("Record deleted.")
+else:
+    print("No matching record found.")
+
+·	OUTPUT :
+Record deleted.
+
