@@ -1,4 +1,4 @@
-Explicit Cursor
+## Explicit Cursor
 
 DECLARE
    CURSOR prod_cursor IS
@@ -21,7 +21,7 @@ BEGIN
 END;
 /
 
-Implicit Cursor
+## Implicit Cursor
 
 declare
 p_price productinfo.price%type;
@@ -36,7 +36,8 @@ end;
 /
 
 
-parameterized.sql
+## parameterized.sql
+
 DECLARE
   CURSOR product_cursor(p_price_1 NUMBER) IS 
     SELECT product_id, product_name, price 
@@ -68,7 +69,8 @@ EXCEPTION
 END;
 /
 
-for loop.sql
+## for loop.sql
+
 DECLARE
 v_increase NUMBER := 2.10;  
 BEGIN
@@ -81,7 +83,8 @@ DBMS_OUTPUT.PUT_LINE('Prices updated.');
 END;
 /
 
-Output:-
+## Output:-
+
 SQL*Plus: Release 21.0.0.0.0 - Production on Mon Sep 29 15:45:18 2025
 Version 21.3.0.0.0
 
