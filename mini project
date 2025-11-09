@@ -1,0 +1,268 @@
+C:\Users\Admin>mysql -u root -p
+Enter password: ************
+Welcome to the MySQL monitor. Commands end with ; or \g.
+Your MySQL connection id is 14
+Server version: 8.0.44 MySQL Community Server - GPL
+Copyright (c) 2000, 2025, Oracle and/or its affiliates.
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+mysql> CREATE DATABASE rec;
+Query OK, 1 row affected (0.01 sec)
+mysql> use rec;
+Database changed
+mysql> CREATE TABLE student (rollNo INT PRIMARY KEY,name
+VARCHAR(100),fname VARCHAR(100),sub VARCHAR(100),grade
+VARCHAR(10));
+Query OK, 0 rows affected (0.07 sec)
+mysql> select * from student;
+Empty set (0.00 sec)
+mysql> select * from student;
++--------+--------+---------+------+-------+
+| rollNo | name | fname | sub | grade |
++--------+--------+---------+------+-------+
+| 22 | neha | kohle | java | 8.7 |
+| 25 | bhakti | bhoskar | DBMS | 9.1 |
++--------+--------+---------+------+-------+
+2 rows in set (0.00 sec)
+mysql> select * from student;
++--------+----------+---------+--------+-------+
+| rollNo | name | fname | sub | grade |
++--------+----------+---------+--------+-------+
+| 1 | piya | patil | TOC | 8.6 |
+| 22 | neha | kohle | java | 8.7 |
+| 25 | bhakti | bhoskar | DBMS | 9.1 |
+| 45 | shravani | kavle | python | 9.8 |
++--------+----------+---------+--------+-------+
+4 rows in set (0.00 sec)
+mysql> select * from student;
++--------+----------+---------+--------+-------+
+| rollNo | name | fname | sub | grade |
++--------+----------+---------+--------+-------+
+| 1 | piya | patil | SPOS | 8.6 |
+| 22 | neha | kohle | java | 8.7 |
+| 25 | bhakti | bhoskar | DBMS | 9.1 |
+| 45 | shravani | kavle | python | 9.8 |
+4 rows in set (0.00 sec)
+mysql> select * from student;
++--------+----------+---------+--------+-------+
+| rollNo | name | fname | sub | grade |
++--------+----------+---------+--------+-------+
+| 22 | neha | kohle | java | 8.7 |
+| 25 | bhakti | bhoskar | DBMS | 9.1 |
+| 45 | shravani | kavle | python | 9.8 |
++--------+----------+---------+--------+-------+
+3 rows in set (0.00 sec)
+
+
+###------- SOURCE CODE IN PYTHON/FRONT END CODE ------------###
+
+
+xscrollcommand=x_scroll.set,
+yscrollcommand=y_scroll.set
+)
+x_scroll.config(command=self.table.xview)
+y_scroll.config(command=self.table.yview)
+self.table.heading("roll", text="Roll No")
+self.table.heading("name", text="Name")
+self.table.heading("fname", text="Last Name")
+self.table.heading("sub", text="Subject")
+self.table.heading("grade", text="Grade")
+self.table["show"] = "headings"
+for col in ("roll", "name", "fname", "sub", "grade"):
+self.table.column(col, width=150, anchor="center")
+self.table.pack(fill="both", expand=True)
+# -------- Add Student -------- #
+def addFrameFun(self):
+self.newWindow("Add Student", [
+("Roll No", "roll"),
+("Name", "name"),
+("Last Name", "fname"),
+("Subject", "sub"),
+("Grade", "grade")
+], self.addFun)
+def addFun(self):
+try:
+rn = self.entries["roll"].get().strip()
+name = self.entries["name"].get().strip()
+fname = self.entries["fname"].get().strip()
+sub = self.entries["sub"].get().strip()
+grade = self.entries["grade"].get().strip()
+if not all([rn, name, fname, sub, grade]):
+messagebox.showerror("Error", "Please fill all input fields!")
+return
+self.dbFun()
+query = "INSERT INTO student (rollNo, name, fname, sub, grade) VALUES
+(%s, %s, %s, %s, %s)"
+self.cur.execute(query, (rn, name, fname, sub, grade))
+self.con.commit()
+messagebox.showinfo("Success", f"Student {name} (Roll No: {rn}) added
+successfully!")
+self.showAll()
+self.popup.destroy()
+except Exception as e:
+messagebox.showerror("Error", f"Error: {e}")
+finally:
+try:
+self.con.close()
+except:
+pass
+# -------- Search Student -------- #
+def searchFrameFun(self):
+# note: combo=True means create combobox for 'option' AND a value entry for
+'value'
+self.newWindow("Search Student", [("Search By", "option"), ("Value",
+"value")], self.searchFun, combo=True)
+def searchFun(self):
+# Validate selection and perform search
+opt = self.option.get().strip()
+val = self.value.get().strip()
+# Allowed columns
+allowed = ("rollNo", "name", "sub")
+if opt not in allowed:
+messagebox.showerror("Error", "Please select a valid field (rollNo, name or
+sub).")
+return
+if not val:
+messagebox.showerror("Error", "Please enter a value to search.")
+return
+try:
+self.dbFun()
+query = f"SELECT * FROM student WHERE {opt}=%s"
+self.cur.execute(query, (val,))
+data = self.cur.fetchall()
+self.table.delete(*self.table.get_children())
+for i in data:
+self.table.insert('', tk.END, values=i)
+# close connection & popup
+self.popup.destroy()
+except Exception as e:
+messagebox.showerror("Error", f"Error: {e}")
+finally:
+try:
+self.con.close()
+except:
+pass
+# -------- Update Record -------- #
+def updFrameFun(self):
+self.newWindow("Update Record", [
+("Field (name/sub/grade)", "option"),
+("New Value", "value"),
+("Roll No", "roll")
+], self.updFun)
+def updFun(self):
+opt = self.entries["option"].get().strip()
+val = self.entries["value"].get().strip()
+rNo = self.entries["roll"].get().strip()
+if opt not in ("name", "sub", "grade"):
+messagebox.showerror("Error", "Field must be one of name, sub or grade.")
+return
+if not (val and rNo):
+messagebox.showerror("Error", "Please provide both new value and roll
+number.")
+return
+try:
+self.dbFun()
+query = f"UPDATE student SET {opt}=%s WHERE rollNo=%s"
+self.cur.execute(query, (val, rNo))
+self.con.commit()
+messagebox.showinfo("Success", f"Record Updated for Roll No {rNo}")
+self.showAll()
+self.popup.destroy()
+except Exception as e:
+messagebox.showerror("Error", f"Error: {e}")
+finally:
+try:
+self.con.close()
+except:
+pass
+# -------- Delete Record -------- #
+def delFrameFun(self):
+self.newWindow("Remove Student", [("Roll No", "roll")], self.delFun)
+def delFun(self):
+rNo = self.entries["roll"].get().strip()
+if not rNo:
+messagebox.showerror("Error", "Please enter Roll No.")
+return
+try:
+self.dbFun()
+self.cur.execute("DELETE FROM student WHERE rollNo=%s", (rNo,))
+self.con.commit()
+messagebox.showinfo("Success", f"Student Roll No {rNo} removed
+successfully.")
+self.showAll()
+self.popup.destroy()
+except Exception as e:
+messagebox.showerror("Error", f"Error: {e}")
+finally:
+try:
+self.con.close()
+except:
+pass
+# -------- Database Connection -------- #
+def dbFun(self):
+# change 'yourpassword' to your actual DB password
+self.con = pymysql.connect(host="localhost", user="root",
+passwd="Shra@2807", database="rec")
+self.cur = self.con.cursor()
+# -------- Reusable Small Window -------- #
+def newWindow(self, title, fields, command, combo=False):
+# Destroys any previous popup reference (safe)
+if hasattr(self, "popup") and self.popup.winfo_exists():
+try:
+self.popup.destroy()
+except:
+pass
+self.popup = tk.Toplevel(self.root)
+self.popup.title(title)
+self.popup.geometry("460x420+400+200")
+self.popup.configure(bg="#caf0f8")
+self.entries = {}
+tk.Label(self.popup, text=title, font=("Segoe UI Black", 20), bg="#00b4d8",
+fg="white", relief="flat").pack(fill="x", pady=5)
+frame = tk.Frame(self.popup, bg="#caf0f8")
+frame.pack(pady=20)
+for i, (label, key) in enumerate(fields):
+tk.Label(frame, text=f"{label}:", font=("Segoe UI Semibold", 13),
+bg="#caf0f8").grid(row=i, column=0, pady=10, padx=10)
+if combo and key == "option":
+# create combobox for selecting column
+self.option = ttk.Combobox(frame, values=("rollNo", "name", "sub"),
+font=("Segoe UI", 12), state="readonly")
+self.option.set("Select Field")
+self.option.grid(row=i, column=1, padx=10, pady=10)
+elif combo and key == "value":
+# for combo mode we also need a separate entry for the value
+self.value = tk.Entry(frame, font=("Segoe UI", 12), width=20, bd=2,
+relief="groove")
+self.value.grid(row=i, column=1, padx=10, pady=10)
+else:
+entry = tk.Entry(frame, font=("Segoe UI", 12), width=20, bd=2,
+relief="groove")
+entry.grid(row=i, column=1, padx=10, pady=10)
+# store in entries dict for normal (non-combo) or update windows
+self.entries[key] = entry
+tk.Button(self.popup, text="Submit", command=command, bg="#00b4d8",
+fg="white",
+font=("Segoe UI", 14, "bold"), bd=0, relief="flat", width=15,
+cursor="hand2").pack(pady=15)
+def showAll(self):
+try:
+self.dbFun()
+self.cur.execute("SELECT * FROM student")
+data = self.cur.fetchall()
+self.table.delete(*self.table.get_children())
+for i in data:
+self.table.insert('', tk.END, values=i)
+except Exception as e:
+messagebox.showerror("Error", f"Error: {e}")
+finally:
+try:
+self.con.close()
+except:
+pass
+root = tk.Tk()
+obj = StudentApp(root)
+root.mainloop()
+
